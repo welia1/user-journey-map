@@ -17,27 +17,41 @@ Every generated document ships with a built-in **Export PNG** button that render
 
 ## Install
 
-Clone or copy this folder into your Claude Code skills directory:
-
 ```bash
-# user-level (available to all projects)
+# 1. Clone the repo into your Claude Code skills directory
 git clone https://github.com/<your-username>/user-journey-map.git ~/.claude/skills/user-journey-map
 
-# or project-level (only in one project)
-git clone https://github.com/<your-username>/user-journey-map.git .claude/skills/user-journey-map
+# 2. (Optional) install the /user-journey-map slash command
+bash ~/.claude/skills/user-journey-map/install.sh
 ```
 
-Claude Code picks up the skill automatically — no config needed. The next time you ask for a journey map in that project, the skill's instructions load into context.
+The clone gives you the skill itself — Claude Code auto-loads it by description match whenever you mention user journeys, swimlane diagrams, integration flows, etc.
+
+The `install.sh` script symlinks the slash command into `~/.claude/commands/` so you can also invoke it manually.
+
+For project-level installation (only inside one repo), clone into `.claude/skills/user-journey-map` instead.
 
 ## Use
 
-Just ask:
+**By description** (skill auto-loads):
 
 > Create a user journey for how a customer signs in through our SSO provider and syncs profile data.
 
 > Adapt the flow map to show the purchase path with the payments provider.
 
-Claude will copy `template.html`, rename the actor lanes, and build the scenarios around your process.
+**By slash command** (after running `install.sh`):
+
+```
+/user-journey-map
+```
+
+Or with an inline brief:
+
+```
+/user-journey-map charting how users authenticate via OAuth and sync their profile
+```
+
+Either way, Claude copies `template.html`, renames the actor lanes, and builds the scenarios around your process.
 
 ## Manual use (no Claude Code)
 
@@ -55,10 +69,13 @@ The template uses only one external dependency (the `html2canvas` library from u
 
 ```
 user-journey-map/
-├── SKILL.md        # Instructions loaded by Claude Code
-├── template.html   # Working template with all components + export button
-├── README.md       # This file
-└── LICENSE         # MIT
+├── SKILL.md                       # Instructions loaded by Claude Code
+├── template.html                  # Working template with all components + export button
+├── commands/
+│   └── user-journey-map.md        # Slash command definition
+├── install.sh                     # Symlinks the slash command into ~/.claude/commands/
+├── README.md                      # This file
+└── LICENSE                        # MIT
 ```
 
 ## Design language
