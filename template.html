@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Journey Map · Template</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ───────── TOKENS ───────── */
+:root{
+  --bg:#ffffff;
+  --bg-2:#fafafa;
+  --ink:#0a0a0a;
+  --ink-2:#262626;
+  --ink-muted:#737373;
+  --ink-faint:#a3a3a3;
+  --border:#e5e5e5;
+  --border-2:#d4d4d4;
+
+  /* actor palette — rename / recolour to match the journey */
+  --member:#6b7280;
+  --member-tint:#f3f4f6;
+  --partner:#0f766e;
+  --partner-tint:#e6f1ef;
+  --primary:#5b3fb8;
+  --primary-tint:#f0ecfa;
+  --ext:#57534e;
+  --ext-tint:#f5f4f2;
+
+  /* status */
+  --ok:#16794d;
+  --ok-tint:#ecf5f0;
+  --warn:#a16207;
+  --warn-tint:#fef7e6;
+  --err:#c0392b;
+  --err-tint:#fbecea;
+
+  --r:6px;
+  --r-lg:10px;
+  --font:'Inter Tight',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--font);font-size:13px;line-height:1.5;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:40px 40px 72px}
+::selection{background:var(--ink);color:#fff}
+
+/* ───────── EXPORT BUTTON ───────── */
+.export-btn{
+  position:fixed;top:24px;right:24px;z-index:100;
+  padding:10px 16px;display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--font);font-size:12px;font-weight:500;letter-spacing:.02em;
+  color:#fff;background:#0a0a0a;border:1px solid #0a0a0a;border-radius:100px;
+  cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.12);
+  transition:background .15s,transform .15s,box-shadow .15s;
+}
+.export-btn:hover{background:#262626;transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.15)}
+.export-btn:active{transform:translateY(0)}
+.export-btn:disabled{opacity:.6;cursor:wait;transform:none}
+.export-btn svg{flex-shrink:0}
+@media print{.export-btn{display:none}}
+
+/* ───────── LEGEND ───────── */
+.legend{
+  padding:12px 18px;background:var(--bg);
+  border:1px solid var(--border);border-radius:var(--r-lg);
+  display:flex;align-items:center;flex-wrap:wrap;gap:22px;
+}
+.legend-title{
+  font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);
+  padding-right:16px;border-right:1px solid var(--border);font-weight:500;
+}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2)}
+.legend-chip{display:inline-block;width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.legend-chip.member{background:var(--member)}
+.legend-chip.partner{background:var(--partner)}
+.legend-chip.primary{background:var(--primary)}
+.legend-chip.ext{background:var(--ext)}
+.legend-arrow{width:34px;height:12px;position:relative;display:flex;align-items:center}
+.legend-arrow::before{
+  content:'';position:absolute;left:0;right:7px;top:50%;height:1.5px;
+  background:var(--ink);transform:translateY(-50%);
+}
+.legend-arrow::after{
+  content:'';position:absolute;right:0;top:50%;
+  border:4px solid transparent;border-left-color:var(--ink);transform:translateY(-50%);
+}
+.legend-arrow.dashed::before{background:none;border-top:1.5px dashed var(--err)}
+.legend-arrow.dashed::after{border-left-color:var(--err)}
+
+/* ───────── SCENARIO HEADER ───────── */
+.scenario{margin-top:56px}
+.scenario-head{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:24px;
+  padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:22px;
+}
+.s-body{max-width:720px}
+.s-kicker{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-muted);margin-bottom:10px;font-weight:500;
+}
+.s-kicker .d{display:inline-block;width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.s-kicker.a .d{background:var(--partner)}
+.s-kicker.b .d{background:var(--primary)}
+.s-kicker.c .d{background:var(--warn)}
+.s-kicker .num{color:var(--ink);font-weight:600;margin-right:3px}
+.s-title{font-size:22px;line-height:1.2;font-weight:600;letter-spacing:-.02em;color:var(--ink);margin-bottom:6px}
+.s-title em{font-style:normal;font-weight:400;color:var(--ink-muted)}
+.s-desc{font-size:13px;color:var(--ink-muted);line-height:1.55;max-width:640px}
+
+.s-tags{display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0}
+.tag{
+  font-size:10px;letter-spacing:.04em;text-transform:uppercase;
+  padding:4px 9px;border-radius:100px;white-space:nowrap;border:1px solid currentColor;
+  display:inline-flex;align-items:center;gap:5px;font-weight:500;
+}
+.tag .d{display:inline-block;width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.tag.ok{color:var(--ok);background:var(--ok-tint)}
+.tag.warn{color:var(--warn);background:var(--warn-tint)}
+.tag.err{color:var(--err);background:var(--err-tint)}
+.tag.mute{color:var(--ink-muted);background:var(--bg-2)}
+
+/* ───────── JOURNEY ───────── */
+.journey{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:20px 20px 26px;position:relative;
+}
+.j-lanes{
+  display:grid;grid-template-columns:36px repeat(4,1fr);column-gap:14px;
+  padding-bottom:10px;margin-bottom:16px;border-bottom:1px solid var(--border);
+}
+.lane{
+  font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  text-align:center;padding:8px 0 0;font-weight:600;position:relative;
+}
+.lane::before{
+  content:'';position:absolute;left:50%;top:0;width:32px;height:2px;
+  background:currentColor;transform:translateX(-50%);
+}
+.lane-m{color:var(--member)}
+.lane-c{color:var(--partner)}
+.lane-x{color:var(--primary)}
+.lane-e{color:var(--ext)}
+.lane-dim{color:var(--ink-faint)}
+.lane-dim::before{background:var(--ink-faint)}
+
+/* Step + flow rows */
+.row{display:grid;grid-template-columns:36px repeat(4,1fr);column-gap:14px;align-items:stretch}
+.step .n{
+  font-size:10px;font-weight:500;color:var(--ink-faint);
+  padding-top:14px;letter-spacing:.02em;text-align:right;padding-right:3px;
+}
+
+/* Node card */
+.node{
+  border:1px solid var(--border);border-radius:var(--r);
+  padding:11px 13px;background:var(--bg);position:relative;
+  transition:border-color .15s,box-shadow .15s;
+}
+.node:hover{border-color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.node .chip{
+  font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:4px;display:flex;align-items:center;gap:5px;font-weight:500;
+}
+.node .chip .d{display:inline-block;width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
+.node .t{font-size:13px;font-weight:600;color:var(--ink);line-height:1.3;letter-spacing:-.005em}
+.node .sub{font-size:11.5px;color:var(--ink-muted);margin-top:3px;line-height:1.4}
+.node.m{border-left:3px solid var(--member)}
+.node.c{border-left:3px solid var(--partner)}
+.node.x{border-left:3px solid var(--primary)}
+.node.e{border-left:3px solid var(--ext)}
+.node.m .chip{color:var(--member)}
+.node.c .chip{color:var(--partner)}
+.node.x .chip{color:var(--primary)}
+.node.e .chip{color:var(--ext)}
+
+/* Flow rows */
+.flow{min-height:36px;align-items:stretch}
+.flow > *{display:flex;align-items:center;justify-content:center;position:relative}
+
+.v{width:100%;padding:5px 0;flex-direction:column}
+.v-line{width:1.5px;background:var(--ink);flex:1;min-height:14px}
+.v::after{
+  content:'';position:absolute;left:50%;bottom:3px;transform:translateX(-50%);
+  border:4px solid transparent;border-top-color:var(--ink);
+}
+.v.accent .v-line{background:var(--primary)}
+.v.accent::after{border-top-color:var(--primary)}
+.v.danger .v-line{background:none;border-left:1.5px dashed var(--err);width:0}
+.v.danger::after{border-top-color:var(--err)}
+
+.h{
+  grid-column-start:var(--gs);grid-column-end:var(--ge);
+  padding:14px 12px 6px;min-height:36px;position:relative;display:flex;align-items:center;
+}
+.h .line{flex:1;height:1.5px;background:var(--ink);position:relative}
+.h .line::after{
+  content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);
+  border:4px solid transparent;border-left-color:var(--ink);
+}
+.h .label{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  font-size:9px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;
+  color:var(--ink-muted);background:var(--bg);padding:0 8px;white-space:nowrap;
+}
+.h.rev .line::after{left:-1px;right:auto;border-left-color:transparent;border-right-color:var(--ink)}
+.h.accent .line{background:var(--primary)}
+.h.accent .line::after{border-left-color:var(--primary)}
+.h.accent.rev .line::after{border-left-color:transparent;border-right-color:var(--primary)}
+.h.accent .label{color:var(--primary)}
+.h.partner .line{background:var(--partner)}
+.h.partner .line::after{border-left-color:var(--partner)}
+.h.partner.rev .line::after{border-left-color:transparent;border-right-color:var(--partner)}
+.h.partner .label{color:var(--partner)}
+.h.danger .line{background:none;border-top:1.5px dashed var(--err);height:0}
+.h.danger .line::after{border-left-color:var(--err)}
+.h.danger.rev .line::after{border-left-color:transparent;border-right-color:var(--err)}
+.h.danger .label{color:var(--err)}
+
+/* Callouts */
+.callouts{margin-top:16px;display:flex;flex-direction:column;gap:6px}
+.callout{
+  display:flex;align-items:flex-start;gap:10px;padding:11px 14px;
+  border-radius:var(--r);font-size:12px;line-height:1.5;border:1px solid;
+}
+.callout .cicon{
+  width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;
+  align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;
+}
+.callout strong{font-weight:600}
+.callout .ctext{color:var(--ink-2)}
+.callout.ok{background:var(--ok-tint);border-color:rgba(22,121,77,.2)}
+.callout.ok .cicon{background:var(--ok)}
+.callout.ok .ctext strong{color:var(--ok)}
+.callout.warn{background:var(--warn-tint);border-color:rgba(161,98,7,.2)}
+.callout.warn .cicon{background:var(--warn)}
+.callout.warn .ctext strong{color:var(--warn)}
+.callout.err{background:var(--err-tint);border-color:rgba(192,57,43,.2)}
+.callout.err .cicon{background:var(--err)}
+.callout.err .ctext strong{color:var(--err)}
+.callout.info{background:var(--partner-tint);border-color:rgba(15,118,110,.2)}
+.callout.info .cicon{background:var(--partner)}
+.callout.info .ctext strong{color:var(--partner)}
+
+/* Path */
+.path{margin-top:28px}
+.path:first-of-type{margin-top:0}
+.path-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.path-kicker{
+  font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 9px;border-radius:100px;font-weight:600;
+}
+.path-kicker.ok{color:var(--ok);background:var(--ok-tint)}
+.path-kicker.err{color:var(--err);background:var(--err-tint)}
+.path-kicker.neutral{color:var(--primary);background:var(--primary-tint)}
+.path-label{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.path-label em{font-style:normal;font-weight:400;color:var(--ink-muted)}
+.path-rule{flex:1;height:1px;background:var(--border)}
+
+/* ───────── BLOCK HEADING ───────── */
+.block-head{margin:64px 0 22px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.block-head h2{font-size:22px;line-height:1.2;font-weight:600;letter-spacing:-.02em;color:var(--ink);margin-bottom:5px}
+.block-head h2 em{font-style:normal;font-weight:400;color:var(--ink-muted)}
+.block-head p{font-size:13px;color:var(--ink-muted);max-width:640px}
+
+/* ───────── SUMMARY COMPARE ───────── */
+.compare-wrap{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.compare{width:100%;border-collapse:collapse;font-size:12px}
+.compare thead th{
+  text-align:left;padding:14px 16px;background:var(--bg-2);
+  font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;color:var(--ink-faint);
+  border-bottom:1px solid var(--border);vertical-align:top;width:22%;
+}
+.compare thead th:first-child{width:34%}
+.compare thead th em{
+  display:block;font-style:normal;font-size:13px;font-weight:600;
+  color:var(--ink);margin-top:5px;letter-spacing:-.01em;line-height:1.2;text-transform:none;
+}
+.compare thead th .lbl{font-weight:600;color:var(--ink-muted);margin-right:5px}
+.compare tbody td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--ink-2);vertical-align:middle}
+.compare tbody tr:last-child td{border-bottom:none}
+.compare tbody td:first-child{font-weight:500;color:var(--ink);font-size:12.5px}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10px;letter-spacing:.02em;font-weight:500;
+  padding:4px 9px;border-radius:100px;border:1px solid currentColor;
+}
+.badge .ic{display:none}
+.badge.ok{color:var(--ok);background:var(--ok-tint)}
+.badge.no{color:var(--err);background:var(--err-tint)}
+.badge.part{color:var(--warn);background:var(--warn-tint)}
+.badge.info{color:var(--partner);background:var(--partner-tint)}
+
+/* ───────── QUESTIONS ───────── */
+.questions{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.q-card{
+  padding:18px 20px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);
+  transition:border-color .15s;
+}
+.q-card:hover{border-color:var(--ink)}
+.q-card.critical{border-color:var(--err);background:var(--err-tint)}
+.q-num{
+  font-size:10px;color:var(--ink-faint);letter-spacing:.06em;text-transform:uppercase;
+  margin-bottom:8px;font-weight:500;
+}
+.q-num .n{color:var(--ink);font-weight:600;margin-right:5px}
+.q-num .flag{color:var(--err);font-weight:600;margin-left:6px}
+.q-card h4{
+  font-size:15px;line-height:1.3;letter-spacing:-.01em;font-weight:600;color:var(--ink);margin-bottom:6px;
+}
+.q-card h4 em{font-style:normal;font-weight:400;color:var(--ink-muted)}
+.q-card p{font-size:12px;color:var(--ink-muted);line-height:1.5}
+
+/* ───────── FOOT ───────── */
+.foot{
+  margin-top:72px;padding-top:16px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;color:var(--ink-faint);
+}
+.foot strong{color:var(--ink);font-weight:500}
+</style>
+</head>
+<body>
+
+<!-- ═════════ EXPORT BUTTON ═════════ -->
+<button class="export-btn" id="export-btn" aria-label="Export as PNG">
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
+  </svg>
+  <span>Export PNG</span>
+</button>
+
+<div class="wrap">
+
+<!-- ═════════ LEGEND ═════════ -->
+<div class="legend">
+  <div class="legend-title">Key</div>
+  <div class="legend-item"><div class="legend-chip member"></div>User</div>
+  <div class="legend-item"><div class="legend-chip partner"></div>Partner system</div>
+  <div class="legend-item"><div class="legend-chip primary"></div>Primary system</div>
+  <div class="legend-item"><div class="legend-chip ext"></div>External</div>
+  <div class="legend-item"><div class="legend-arrow"></div>Automated flow</div>
+  <div class="legend-item"><div class="legend-arrow dashed"></div>Manual / gap</div>
+</div>
+
+
+<!-- ═════════ SCENARIO 01 ═════════ -->
+<section class="scenario" id="s1">
+  <div class="scenario-head">
+    <div class="s-body">
+      <div class="s-kicker a"><span class="num">01</span><span class="d"></span>Happy path</div>
+      <h2 class="s-title">User signs in &amp; <em>onboards.</em></h2>
+      <p class="s-desc">A minimal scenario showing the standard step → flow → step pattern with a multi-node handoff row, a forward cross-lane arrow, a reverse arrow, and a vertical arrow inside a single lane.</p>
+    </div>
+    <div class="s-tags">
+      <span class="tag ok"><span class="d"></span>Standard</span>
+      <span class="tag mute">Example</span>
+    </div>
+  </div>
+
+  <div class="journey">
+    <div class="j-lanes">
+      <div></div>
+      <div class="lane lane-m">User</div>
+      <div class="lane lane-c">Partner system</div>
+      <div class="lane lane-x">Primary system</div>
+      <div class="lane lane-dim">External · n/a</div>
+    </div>
+
+    <!-- Step 1: multi-node handoff row -->
+    <div class="row step">
+      <div class="n">01</div>
+      <div><div class="node m"><div class="chip"><span class="d"></span>User</div><div class="t">Clicks sign in</div><div class="sub">From the primary system entry point.</div></div></div>
+      <div></div>
+      <div><div class="node x"><div class="chip"><span class="d"></span>Primary</div><div class="t">Initiates auth</div><div class="sub">Builds an auth request for the partner system.</div></div></div>
+      <div></div>
+    </div>
+
+    <!-- Flow: Primary → Partner (reverse, partner colour) -->
+    <div class="row flow">
+      <div></div><div></div>
+      <div class="h partner rev" style="--gs:3;--ge:5"><div class="line"></div><div class="label">Auth request</div></div>
+      <div></div>
+    </div>
+
+    <!-- Step 2: Partner authenticates -->
+    <div class="row step">
+      <div class="n">02</div>
+      <div></div>
+      <div><div class="node c"><div class="chip"><span class="d"></span>Partner</div><div class="t">Authorises &amp; authenticates</div><div class="sub">Validates credentials and issues a token.</div></div></div>
+      <div></div><div></div>
+    </div>
+
+    <!-- Flow: Partner → Primary (forward, partner colour) -->
+    <div class="row flow">
+      <div></div><div></div>
+      <div class="h partner" style="--gs:3;--ge:5"><div class="line"></div><div class="label">Token</div></div>
+      <div></div>
+    </div>
+
+    <!-- Step 3: Primary fetches context -->
+    <div class="row step">
+      <div class="n">03</div>
+      <div></div><div></div>
+      <div><div class="node x"><div class="chip"><span class="d"></span>Primary</div><div class="t">Fetches user context</div><div class="sub">Server-to-server API call using the token.</div></div></div>
+      <div></div>
+    </div>
+
+    <!-- Vertical arrow in primary lane (accent colour) -->
+    <div class="row flow">
+      <div></div><div></div><div></div>
+      <div class="v accent"><div class="v-line"></div></div>
+      <div></div>
+    </div>
+
+    <!-- Step 4: Primary provisions account -->
+    <div class="row step">
+      <div class="n">04</div>
+      <div></div><div></div>
+      <div><div class="node x"><div class="chip"><span class="d"></span>Primary</div><div class="t">Provisions account</div><div class="sub">Stores profile and creates the local session.</div></div></div>
+      <div></div>
+    </div>
+
+    <!-- Flow: Primary → User (reverse, neutral colour, full width) -->
+    <div class="row flow">
+      <div></div>
+      <div class="h rev" style="--gs:2;--ge:5"><div class="line"></div><div class="label">Signed in</div></div>
+      <div></div>
+    </div>
+
+    <!-- Step 5: User on app -->
+    <div class="row step">
+      <div class="n">05</div>
+      <div><div class="node m"><div class="chip"><span class="d"></span>User</div><div class="t">Lands on the app</div><div class="sub">Session is live — the journey begins.</div></div></div>
+      <div></div><div></div><div></div>
+    </div>
+
+    <div class="callouts">
+      <div class="callout ok"><div class="cicon">✓</div><div class="ctext"><strong>Frictionless sign-in.</strong> User presents existing partner credentials — no new account to create on the primary system.</div></div>
+      <div class="callout info"><div class="cicon">i</div><div class="ctext"><strong>Partner is authoritative for identity.</strong> The primary system mirrors profile data but treats the partner as the source of truth.</div></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═════════ SCENARIO 02 — with paths ═════════ -->
+<section class="scenario" id="s2">
+  <div class="scenario-head">
+    <div class="s-body">
+      <div class="s-kicker c"><span class="num">02</span><span class="d"></span>Edge cases</div>
+      <h2 class="s-title">One scenario, <em>two paths.</em></h2>
+      <p class="s-desc">Use <code>.path</code> when a single scenario branches into meaningfully different flows — here, the viable happy path versus the blocker path.</p>
+    </div>
+    <div class="s-tags">
+      <span class="tag warn"><span class="d"></span>Edge case</span>
+    </div>
+  </div>
+
+  <div class="journey">
+    <div class="j-lanes">
+      <div></div>
+      <div class="lane lane-m">User</div>
+      <div class="lane lane-c">Partner system</div>
+      <div class="lane lane-x">Primary system</div>
+      <div class="lane lane-e">External</div>
+    </div>
+
+    <!-- ──── PATH A ──── -->
+    <div class="path">
+      <div class="path-head">
+        <span class="path-kicker ok">Path A · viable</span>
+        <div class="path-label">External event, real-time <em>sync</em></div>
+        <div class="path-rule"></div>
+      </div>
+
+      <div class="row step">
+        <div class="n">A1</div>
+        <div></div><div></div><div></div>
+        <div><div class="node e"><div class="chip"><span class="d"></span>External</div><div class="t">Event happens elsewhere</div><div class="sub">A change originates outside the primary system.</div></div></div>
+      </div>
+
+      <div class="row flow">
+        <div></div><div></div><div></div>
+        <div class="h partner rev" style="--gs:4;--ge:6"><div class="line"></div><div class="label">Forwarded</div></div>
+      </div>
+
+      <div class="row step">
+        <div class="n">A2</div>
+        <div></div>
+        <div><div class="node c"><div class="chip"><span class="d"></span>Partner</div><div class="t">Emits webhook</div><div class="sub">Pushes the event to subscribed consumers in real time.</div></div></div>
+        <div></div><div></div>
+      </div>
+
+      <div class="row flow">
+        <div></div><div></div>
+        <div class="h partner" style="--gs:3;--ge:5"><div class="line"></div><div class="label">webhook · event</div></div>
+        <div></div>
+      </div>
+
+      <div class="row step">
+        <div class="n">A3</div>
+        <div></div><div></div>
+        <div><div class="node x"><div class="chip"><span class="d"></span>Primary</div><div class="t">Updates local state</div><div class="sub">Refreshes its mirror so the user sees the new state immediately.</div></div></div>
+        <div></div>
+      </div>
+
+      <div class="callouts">
+        <div class="callout ok"><div class="cicon">✓</div><div class="ctext"><strong>Consistent across systems.</strong> The primary system is always within milliseconds of the partner source of truth.</div></div>
+      </div>
+    </div>
+
+    <!-- ──── PATH B ──── -->
+    <div class="path">
+      <div class="path-head">
+        <span class="path-kicker err">Path B · blocker</span>
+        <div class="path-label">External event, <em>no real-time channel</em></div>
+        <div class="path-rule"></div>
+      </div>
+
+      <div class="row step">
+        <div class="n">B1</div>
+        <div></div><div></div><div></div>
+        <div><div class="node e"><div class="chip"><span class="d"></span>External</div><div class="t">Event happens elsewhere</div><div class="sub">Same change — different propagation story.</div></div></div>
+      </div>
+
+      <div class="row flow">
+        <div></div><div></div><div></div>
+        <div class="h danger rev" style="--gs:4;--ge:6"><div class="line"></div><div class="label">No push · drift begins</div></div>
+      </div>
+
+      <div class="row step">
+        <div class="n">B2</div>
+        <div></div><div></div>
+        <div><div class="node x"><div class="chip"><span class="d"></span>Primary</div><div class="t">Holds stale state</div><div class="sub">Has no way to learn about the change until the next poll or user action.</div></div></div>
+        <div></div>
+      </div>
+
+      <div class="callouts">
+        <div class="callout err"><div class="cicon">!</div><div class="ctext"><strong>Blocker.</strong> Without a real-time channel from the partner system, the primary can't maintain a reliable mirror — the integration cannot proceed on this path.</div></div>
+        <div class="callout warn"><div class="cicon">△</div><div class="ctext"><strong>Escape hatch.</strong> If other consumers already receive real-time updates, the same channel could serve the primary system. Confirm the current state before writing off the integration.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═════════ SUMMARY COMPARE ═════════ -->
+<section id="compare">
+  <div class="block-head">
+    <h2>Summary <em>comparison.</em></h2>
+    <p>Capability matrix — what's already supported, what isn't, and what depends on confirming an open question.</p>
+  </div>
+
+  <div class="compare-wrap">
+    <table class="compare">
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th><span class="lbl">01</span><em>Happy path</em></th>
+          <th><span class="lbl">02</span><em>Edge cases</em></th>
+          <th><em>Status</em></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sign-in via partner SSO</td>
+          <td><span class="badge ok"><span class="ic"></span>Yes</span></td>
+          <td><span class="badge ok"><span class="ic"></span>Yes</span></td>
+          <td><span class="badge ok"><span class="ic"></span>Ready</span></td>
+        </tr>
+        <tr>
+          <td>Server-to-server context fetch</td>
+          <td><span class="badge ok"><span class="ic"></span>API call</span></td>
+          <td><span class="badge ok"><span class="ic"></span>API call</span></td>
+          <td><span class="badge ok"><span class="ic"></span>Ready</span></td>
+        </tr>
+        <tr>
+          <td>Real-time external event sync</td>
+          <td><span class="badge no"><span class="ic"></span>—</span></td>
+          <td><span class="badge part"><span class="ic"></span>Path A only</span></td>
+          <td><span class="badge no"><span class="ic"></span>Open · see Q·01</span></td>
+        </tr>
+        <tr>
+          <td>Write-back to partner system</td>
+          <td><span class="badge no"><span class="ic"></span>—</span></td>
+          <td><span class="badge info"><span class="ic"></span>Spec needed</span></td>
+          <td><span class="badge part"><span class="ic"></span>Pending Q·02</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ═════════ OPEN QUESTIONS ═════════ -->
+<section id="questions">
+  <div class="block-head">
+    <h2>Open <em>questions.</em></h2>
+    <p>Each question has a material impact on scope, sequencing, or ongoing ownership. The first is a blocker — the integration cannot be delivered without an answer.</p>
+  </div>
+
+  <div class="questions">
+    <div class="q-card critical">
+      <div class="q-num"><span class="n">Q · 01</span>Real-time sync<span class="flag">· BLOCKER</span></div>
+      <h4>Does the partner system emit <em>real-time</em> events?</h4>
+      <p>If state changes via another consumer, can the partner push that change to the primary system in real time? Without this, the local mirror drifts and the integration cannot be delivered reliably.</p>
+    </div>
+    <div class="q-card">
+      <div class="q-num"><span class="n">Q · 02</span>Transaction semantics</div>
+      <h4>What shape should the <em>write-back</em> payload take?</h4>
+      <p>When the primary system acts, what payload does the partner expect? API spec, field mappings, and error envelopes need to be locked down before build starts.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═════════ FOOT ═════════ -->
+<footer class="foot">
+  <div><strong>Journey Map</strong> · Template</div>
+  <div>Rev. 01</div>
+</footer>
+
+</div>
+
+<!-- ═════════ EXPORT SCRIPT ═════════ -->
+<script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+(() => {
+  const btn = document.getElementById('export-btn');
+  if (!btn) return;
+
+  btn.addEventListener('click', async () => {
+    const label = btn.querySelector('span');
+    const orig = label ? label.textContent : '';
+    if (label) label.textContent = 'Rendering…';
+    btn.disabled = true;
+
+    try {
+      // Wait for web fonts to load before snapshotting.
+      if (document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
+
+      const target = document.querySelector('.wrap');
+      const canvas = await html2canvas(target, {
+        scale: 2,                   // 2× DPI for retina-quality output
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        logging: false,
+        windowWidth: target.scrollWidth,
+        windowHeight: target.scrollHeight,
+      });
+
+      canvas.toBlob((blob) => {
+        if (!blob) throw new Error('Canvas toBlob returned null');
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const safe = (document.title || 'journey-map')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+        a.download = (safe || 'journey-map') + '.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }, 'image/png');
+    } catch (err) {
+      console.error('Export failed:', err);
+      alert('Export failed. See browser console for details.');
+    } finally {
+      if (label) label.textContent = orig;
+      btn.disabled = false;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
